@@ -18,5 +18,5 @@ gulp.task('conf', function() {
 
 // default gulp task
 gulp.task('watchtask', ['app'], function() {
-  gulp.watch('./app/**/*.*',['app']);
+  gulp.watch('./www/**/*.*',['app']);
 });
