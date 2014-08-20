@@ -45,13 +45,13 @@ Vagrant.configure("2") do |config|
 
 
     echo "--- installing ionic ---"
-    npm install -g ionic 
+    npm install -g ionic
 
     echo "--- install gulpjs globally and locally to the project ---"
     npm install gulp -g
     cd /vagrant
     su vagrant -c "npm install gulp"
-    # gulp app
+    gulp app
     # gulp conf
     # gulp lua
 
