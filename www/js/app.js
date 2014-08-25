@@ -12,6 +12,7 @@ angular.module('bucketList', ['ionic', 'firebase', 'bucketList.controllers'])
         }
 
         $rootScope.userEmail = null;
+        $rootScope.id = null;
         $rootScope.baseUrl = 'https://gaudium.firebaseio.com/';
         var authRef = new Firebase($rootScope.baseUrl);
         $rootScope.auth = $firebaseAuth(authRef);
@@ -51,10 +52,12 @@ angular.module('bucketList', ['ionic', 'firebase', 'bucketList.controllers'])
               //  } else if (user) {
               //      // user authenticated with Firebase
                     $rootScope.userEmail = user.email;
+                    $rootScope.id = user.id;
                     $window.location.href = ('#/bucket/list');
                 } else {
                     // user is logged out
                     $rootScope.userEmail = null;
+                    $rootScope.id = null;
                     $window.location.href = '#/auth/signin';
                 }
             });
@@ -107,6 +110,15 @@ angular.module('bucketList', ['ionic', 'firebase', 'bucketList.controllers'])
                 'bucket-completed': {
                     templateUrl: 'templates/bucket-completed.html',
                     controller: 'completedCtrl'
+                }
+            }
+        })
+        .state('bucket.mytemplate', {
+            url: '/mytemplate',
+            views: {
+                'mytemplate': {
+                    templateUrl: 'templates/mytemplate.html',
+                    controller: 'mytemplateCtrl'
                 }
             }
         })

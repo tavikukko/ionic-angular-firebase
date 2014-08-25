@@ -7,7 +7,8 @@ angular.module('bucketList.controllers', [])
 
             $scope.user = {
                 email: "",
-                password: ""
+                password: "",
+                id: ""
             };
             $scope.validateUser = function() {
                 $rootScope.show('Please wait.. Authenticating');
@@ -24,6 +25,7 @@ angular.module('bucketList.controllers', [])
                 }).then(function(user) {
                     $rootScope.hide();
                     $rootScope.userEmail = user.email;
+                    $rootScope.id = user.id;
                     $window.location.href = ('#/bucket/list');
                 }, function(error) {
                     $rootScope.hide();
@@ -62,6 +64,7 @@ angular.module('bucketList.controllers', [])
                 if (!error) {
                     $rootScope.hide();
                     $rootScope.userEmail = user.email;
+                    $rootScope.id = user.id;
                     $window.location.href = ('#/bucket/list');
                 } else {
                     $rootScope.hide();
@@ -81,7 +84,7 @@ angular.module('bucketList.controllers', [])
 .controller('myListCtrl', function($rootScope, $scope, $window, $ionicModal, $firebase) {
     $rootScope.show("Please wait... Processing");
     $scope.list = [];
-    var bucketListRef = new Firebase($rootScope.baseUrl + escapeEmailAddress($rootScope.userEmail));
+    var bucketListRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
     bucketListRef.on('value', function(snapshot) {
         var data = snapshot.val();
         $scope.list = [];
@@ -113,7 +116,7 @@ angular.module('bucketList.controllers', [])
 
     $scope.markCompleted = function(key) {
         $rootScope.show("Please wait... Updating List");
-        var itemRef = new Firebase($rootScope.baseUrl + escapeEmailAddress($rootScope.userEmail) + '/' + key);
+        var itemRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id + '/' + key);
         itemRef.update({
             isCompleted: true
         }, function(error) {
@@ -129,7 +132,71 @@ angular.module('bucketList.controllers', [])
 
     $scope.deleteItem = function(key) {
         $rootScope.show("Please wait... Deleting from List");
-        var itemRef = new Firebase($rootScope.baseUrl + escapeEmailAddress($rootScope.userEmail));
+        var itemRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
+        bucketListRef.child(key).remove(function(error) {
+            if (error) {
+                $rootScope.hide();
+                $rootScope.notify('Oops! something went wrong. Try again later');
+            } else {
+                $rootScope.hide();
+                $rootScope.notify('Successfully deleted');
+            }
+        });
+    };
+})
+
+.controller('mytemplateCtrl', function($rootScope, $scope, $window, $ionicModal, $firebase) {
+    $rootScope.show("Please wait... Processing");
+    $scope.list = [];
+    var bucketListRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
+    bucketListRef.on('value', function(snapshot) {
+        var data = snapshot.val();
+        $scope.list = [];
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                if (data[key].isCompleted == false) {
+                    data[key].key = key;
+                    $scope.list.push(data[key]);
+                }
+            }
+        }
+
+        if ($scope.list.length == 0) {
+            $scope.noData = true;
+        } else {
+            $scope.noData = false;
+        }
+        $rootScope.hide();
+    });
+
+
+    $ionicModal.fromTemplateUrl('templates/newItem.html', function(modal) {
+        $scope.newTemplate = modal;
+    });
+
+    $scope.newTask = function() {
+        $scope.newTemplate.show();
+    };
+
+    $scope.markCompleted = function(key) {
+        $rootScope.show("Please wait... Updating List");
+        var itemRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id + '/' + key);
+        itemRef.update({
+            isCompleted: true
+        }, function(error) {
+            if (error) {
+                $rootScope.hide();
+                $rootScope.notify('Oops! something went wrong. Try again later');
+            } else {
+                $rootScope.hide();
+                $rootScope.notify('Successfully updated');
+            }
+        });
+    };
+
+    $scope.deleteItem = function(key) {
+        $rootScope.show("Please wait... Deleting from List");
+        var itemRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
         bucketListRef.child(key).remove(function(error) {
             if (error) {
                 $rootScope.hide();
@@ -166,7 +233,7 @@ angular.module('bucketList.controllers', [])
             updated: Date.now()
         };
 
-        var bucketListRef = new Firebase($rootScope.baseUrl + escapeEmailAddress($rootScope.userEmail));
+        var bucketListRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
         $firebase(bucketListRef).$add(form);
         $rootScope.hide();
 
@@ -177,7 +244,7 @@ angular.module('bucketList.controllers', [])
     $rootScope.show("Please wait... Processing");
     $scope.list = [];
 
-    var bucketListRef = new Firebase($rootScope.baseUrl + escapeEmailAddress($rootScope.userEmail));
+    var bucketListRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
     bucketListRef.on('value', function(snapshot) {
         $scope.list = [];
         var data = snapshot.val();
@@ -201,7 +268,7 @@ angular.module('bucketList.controllers', [])
 
     $scope.deleteItem = function(key) {
         $rootScope.show("Please wait... Deleting from List");
-        var itemRef = new Firebase($rootScope.baseUrl + escapeEmailAddress($rootScope.userEmail));
+        var itemRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
         bucketListRef.child(key).remove(function(error) {
             if (error) {
                 $rootScope.hide();
