@@ -145,7 +145,7 @@ angular.module('bucketList.controllers', [])
     };
 })
 
-.controller('mytemplateCtrl', function($rootScope, $scope, $window, $ionicModal, $firebase) {
+.controller('mytemplateCtrl', function($rootScope, $scope, $window, $ionicModal, $firebase, $ionicSideMenuDelegate) {
     $rootScope.show("Please wait... Processing");
     $scope.list = [];
     var bucketListRef = new Firebase($rootScope.baseUrl + "/users/" + $rootScope.id);
@@ -173,6 +173,12 @@ angular.module('bucketList.controllers', [])
     $ionicModal.fromTemplateUrl('templates/newItem.html', function(modal) {
         $scope.newTemplate = modal;
     });
+
+//function ContentController($scope, $ionicSideMenuDelegate) {
+  $scope.toggle = function() {
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+//}
 
     $scope.newTask = function() {
         $scope.newTemplate.show();
